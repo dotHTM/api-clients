@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## FIXME:: Tabbed lines in the input file might be NOT be Ingored in this implementation.
+
 source "./feedbin_api.sh"
 
 add_twitter_follow(){

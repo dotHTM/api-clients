@@ -17,42 +17,7 @@ use myapi_config;
 use REST::Client;
 use JSON;
 
-sub header_tuple_array {
-    my ($header_hashref) = @_;
-    my @result_array = ();
-    foreach my $some_key ( keys %{$header_hashref} ) {
-        push @result_array, [ $some_key, $header_hashref->{$some_key} ];
-    }
-    return @result_array;
-}    ##    header_tuple_array
 
-sub get_return {
-    my ( $url, $additional_headers ) = @_;
-    my $client = REST::Client->new();
-
-    my $headers = $BASE_HEADERS;
-    foreach my $somekey ( keys %{$additional_headers} ) {
-        $headers->{$somekey} = $additional_headers->{$somekey};
-    }
-    foreach my $some_tuple ( header_tuple_array($headers) ) {
-        $client->addHeader( $some_tuple->[0], $some_tuple->[1] );
-    }
-    $client->GET($url);
-    return {
-        content => $client->responseContent(),
-        code    => $client->responseCode(),
-        headers => { $client->responseHeaders() },
-    };
-}
-
-sub authentication_check {
-    croak("could not authenticate")
-        unless get_return("https://api.feedbin.com/v2/authentication.json")
-        ->{code} == 200 ? 1 : 0;
-    return;
-}    ##    authentication
-
-authentication_check();
 
 use lib ".";
 use FEEDBIN_API;
