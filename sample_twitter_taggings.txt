@@ -1,0 +1,35 @@
+    # Twitter Taggings
+
+    The data file format is just a plain text file. First item is the resource identifier, followed by attributes to be applied. Any line with leading space characters or empty line is ignored. This makes debugging and testing with a large input file easier to break down in a text editor capable of simple in/out-dent shortcuts. Space between fields is ignored (use as much or as little, s.t. n >= 1 ).
+
+    ## Example:
+
+dothtm  cool_guy    developer
+    someone_else    tabbed_lines_should_be_ignored
+
+    ### news
+
+cnn     news        current_events
+msnbc   news        current_events
+    foxnews news        current_events
+cspan   news        current_events
+bbc   news        current_events
+
+    ### angst
+
+apple   tech    corp    devices
+google  tech    corp    cloud
+yahoo   tech    corp    cloud
+
+johngruber  tech    podcaster   blog
+
+theverge     tech    news
+arstechnica  tech    news     culture
+
+    ### relatable
+    
+McDonalds       brands  corp    food
+wendys          brands  corp    food
+    arbys           brands  corp    food
+jackinthebox    brands  corp    food
+
