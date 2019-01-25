@@ -14,15 +14,13 @@ feedbin:
             nil: "9"
           mid: " 🦆 "
           suffix: ""
-      file:
-        path: "sample_twitter_taggings.txt"
-        columns:
-          first: screen_name
-          rest:  tag_name
+      files:
+        "sample_twitter_taggings.txt":
+          type: space_seperated_values
+          columns:
+            first: screen_name
+            rest:  tag_name
       data:
         dothtm:
           - "cool guy"
           - "developer"
-        
-        
-        

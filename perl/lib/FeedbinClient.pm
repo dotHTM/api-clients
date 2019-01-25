@@ -22,24 +22,22 @@ use parent 'RestClient';
 
 # Constructors
 sub init {
-    my ( $self, @args ) = @_ ;
+    my ( $self, @args ) = @_;
     return $self->FeedbinClient_from_file(@args);
-}   ##  init
-
+}    ##  init
 
 sub FeedbinClient_from_file {
     my ( $self, $config_path ) = @_;
 
     my $new_obj = $self->RestClient_from_file("$config_path");
-    unless ($new_obj->{config}->{version} eq $VERSION ){ croak("config file version mismatch")}
-    
-    $new_obj->{baseurl}                        = "https://api.feedbin.com/v2";
+    unless ( $new_obj->{config}->{version} eq $VERSION ) {
+        croak("config file version mismatch");
+    }
+
+    $new_obj->{baseurl} = "https://api.feedbin.com/v2";
     $new_obj->{config}->{base_headers}->{"Content-Type"} = "application/json";
-    
-    # unless ( $new_obj-> authentication_check  ) {
-    #     carp "authentication failed";
-    #     exit 1;
-    # }
+
+    croak "authentication failed" unless ( $new_obj->authentication_check );
 
     # $new_obj->subscriptions(1);
     # $new_obj->taggings(1);
@@ -51,8 +49,13 @@ sub FeedbinClient_from_file {
 
 # Static Methods
 
-
 # Methods
+sub authentication_check {
+    my ($self) = @_;
+
+    # return ( $self->get("authentication.json") );
+    return ( $self->get("authentication.json")->{code} == 200 );
+}    ##    authentication
 
 sub subscriptions {
     my ( $self, $force ) = @_;
@@ -65,24 +68,6 @@ sub subscriptions {
         $force
     );
 }    ##  subscriptions
-
-sub taggings {
-    my ( $self, $force ) = @_;
-    return $self->cached_array_of_hashrefs(
-        "taggings",
-        sub {
-            my ($other_self) = @_;
-            return $other_self->get_json("taggings.json");
-        },
-        $force
-    );
-}    ##  taggings
-
-sub authentication_check {
-    my ($self) = @_;
-    # return ( $self->get("authentication.json")->{code} == 200 );
-    return ( $self->get("authentication.json") );
-}    ##    authentication
 
 sub create_subscription {
     my ( $self, $feed_url ) = @_;
@@ -125,8 +110,37 @@ sub delete_feed {
     my ( $self, $some_feed, @args ) = @_;
     ## body...
     return $self->delete( 'subscriptions/' . $some_feed->{id} . '.json' );
-
 }    ##  delete_feed
+
+sub rename_feed {
+    my ( $self, $some_feed, $new_name ) = @_;
+
+    my $data = "{ \"title\": \"$new_name\" }";
+
+    my $result
+        = $self->post( "subscriptions/" . $some_feed->{id} . "/update.json",
+        $data );
+
+    if ( $result->{code} == 200 ) {
+        say " => $new_name";
+        return decode_json $result->{content};
+    }
+    carp( join "\n", "rename_feed: issue with post",
+        $some_feed->{id}, $new_name, Dumper $result);
+    return 0;
+}    ##  rename_feed
+
+sub taggings {
+    my ( $self, $force ) = @_;
+    return $self->cached_array_of_hashrefs(
+        "taggings",
+        sub {
+            my ($other_self) = @_;
+            return $other_self->get_json("taggings.json");
+        },
+        $force
+    );
+}    ##  taggings
 
 sub tag_feed {
     my ( $self, $input_feed, $tag_name ) = @_;
@@ -171,25 +185,6 @@ sub tag_feed {
     push @{ $self->{cached_taggings} }, $result;
 
     return $result;
-
 }    ##  tag_feed
-
-sub rename_feed {
-    my ( $self, $some_feed, $new_name ) = @_;
-
-    my $data = "{ \"title\": \"$new_name\" }";
-
-    my $result
-        = $self->post( "subscriptions/" . $some_feed->{id} . "/update.json",
-        $data );
-
-    if ( $result->{code} == 200 ) {
-        say " => $new_name";
-        return decode_json $result->{content};
-    }
-    carp( join "\n", "rename_feed: issue with post",
-        $some_feed->{id}, $new_name, Dumper $result);
-    return 0;
-}    ##  rename_feed
 
 1;

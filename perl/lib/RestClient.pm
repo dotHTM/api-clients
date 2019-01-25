@@ -63,9 +63,6 @@ sub RestClient_from_file {
 
 # Object Methods
 
-
-
-
 ################################################################
 ## REST Methods
 
@@ -84,7 +81,7 @@ sub get {
 
     my $client = REST::Client->new();
 
-    my $headers = $self->{config}->{base_headers};
+    my $headers = $self->{config}->{feedbin}->{options}->{base_headers};
     foreach my $somekey ( keys %{$additional_headers} ) {
         $headers->{$somekey} = $additional_headers->{$somekey};
     }
