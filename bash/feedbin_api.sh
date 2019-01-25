@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# feedbin_api.sh
+# FeedbinClient.sh
 
 
 BASE_URL='https://api.feedbin.com/v2'

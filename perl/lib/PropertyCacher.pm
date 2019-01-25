@@ -1,7 +1,7 @@
-# mlc_obj.pm
+# PropertyCacher.pm
 #   Description
 
-package mlc_obj;
+package PropertyCacher;
 
 use feature ':5.16';
 
@@ -12,12 +12,9 @@ use Carp qw{croak};
 use Data::Dumper::Concise;
 $Data::Dumper::Sortkeys = 1;
 
-our $VERSION = 0.001000;
+our $VERSION = 1.0;
 
 our $COUNT = 0;
-
-use lib ".";
-use mlc_stdlib;
 
 sub new {
     my $inv = shift;
@@ -39,9 +36,7 @@ sub DESTROY {
 
 # Public Variable Methods
 
-# Static Methods
-
-# Object Methods
+# Methods
 
 sub cached_array_of_hashrefs {
     my ( $self, $cache_key, $update_function, $force ) = @_;

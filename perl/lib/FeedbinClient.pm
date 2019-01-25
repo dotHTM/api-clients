@@ -1,7 +1,7 @@
-# feedbin_api.pm
+# FeedbinClient.pm
 #   Description
 
-package FEEDBIN_API;
+package FeedbinClient;
 
 use feature ':5.16';
 
@@ -16,47 +16,33 @@ our $VERSION = 0.001000;
 
 our $COUNT = 0;
 
-use REST::Client;
-use JSON;
-
 use lib ".";
 use mlc_stdlib;
-use parent 'mlc_obj';
-
-sub new {
-    my $inv   = shift;
-    my $class = ref($inv) || $inv;
-    my $self  = {};
-    bless( $self, $class );
-
-    $COUNT++;
-
-    return $self;
-}
-
-sub DESTROY {
-    my ($self) = @_;
-    $COUNT--;
-}
+use parent 'RestClient';
 
 # Constructors
-
 sub init {
-    my ( $self, $headers ) = @_;
+    my ( $self, @args ) = @_ ;
+    return $self->FeedbinClient_from_file(@args);
+}   ##  init
 
-    my $new_obj = $self->new();
 
+sub FeedbinClient_from_file {
+    my ( $self, $config_path ) = @_;
+
+    my $new_obj = $self->RestClient_from_file("$config_path");
+    unless ($new_obj->{config}->{version} eq $VERSION ){ croak("config file version mismatch")}
+    
     $new_obj->{baseurl}                        = "https://api.feedbin.com/v2";
-    $new_obj->{base_headers}                   = $headers;
-    $new_obj->{base_headers}->{"Content-Type"} = "application/json";
+    $new_obj->{config}->{base_headers}->{"Content-Type"} = "application/json";
+    
+    # unless ( $new_obj-> authentication_check  ) {
+    #     carp "authentication failed";
+    #     exit 1;
+    # }
 
-    unless ( $new_obj->authentication_check ) {
-        carp "authentication failed";
-        exit 1;
-    }
-
-    $new_obj->subscriptions(1);
-    $new_obj->taggings(1);
+    # $new_obj->subscriptions(1);
+    # $new_obj->taggings(1);
 
     return $new_obj;    # succeed
 }    ##  init
@@ -65,110 +51,9 @@ sub init {
 
 # Static Methods
 
-sub header_tuple_array {
-    my ($header_hashref) = @_;
-    my @result_array = ();
-    foreach my $some_key ( keys %{$header_hashref} ) {
-        push @result_array, [ $some_key, $header_hashref->{$some_key} ];
-    }
-    return @result_array;
-}    ##    header_tuple_array
 
 # Methods
 
-sub get {
-    my ( $self, $tail_url, $additional_headers ) = @_;
-
-    my $client = REST::Client->new();
-
-    my $headers = $self->{base_headers};
-    foreach my $somekey ( keys %{$additional_headers} ) {
-        $headers->{$somekey} = $additional_headers->{$somekey};
-    }
-    foreach my $some_tuple ( header_tuple_array($headers) ) {
-        $client->addHeader( $some_tuple->[0], $some_tuple->[1] );
-    }
-    $client->GET( $self->{baseurl} . "/" . $tail_url );
-
-    return {
-        content => $client->responseContent(),
-        code    => $client->responseCode(),
-    };    # succeed
-}    ##  get
-
-sub get_content {
-    my ( $self, @args ) = @_;
-    my $result = $self->get(@args);
-
-    return $result->{content};    # succeed
-}    ##  get_content
-
-sub get_json {
-    my ( $self, @args ) = @_;
-    return decode_json $self->get_content(@args);    # succeed
-}    ##  get_json
-
-sub post {
-    my ( $self, $tail_url, $data, $additional_headers ) = @_;
-
-    my $client = REST::Client->new();
-
-    my $headers = $self->{base_headers};
-    foreach my $somekey ( keys %{$additional_headers} ) {
-        $headers->{$somekey} = $additional_headers->{$somekey};
-    }
-    foreach my $some_tuple ( header_tuple_array($headers) ) {
-        $client->addHeader( $some_tuple->[0], $some_tuple->[1] );
-    }
-
-    my $assembled_url = $self->{baseurl} . "/" . $tail_url;
-
-    # say "assembled_url: $assembled_url";
-    # say "data:          $data";
-    $client->POST( $assembled_url, $data );
-
-    return {
-        content => $client->responseContent(),
-        code    => $client->responseCode(),
-    };    # succeed
-}    ##  post
-
-sub delete {
-    my ( $self, $tail_url, $additional_headers ) = @_;
-
-    my $client = REST::Client->new();
-
-    my $headers = $self->{base_headers};
-    foreach my $somekey ( keys %{$additional_headers} ) {
-        $headers->{$somekey} = $additional_headers->{$somekey};
-    }
-    foreach my $some_tuple ( header_tuple_array($headers) ) {
-        $client->addHeader( $some_tuple->[0], $some_tuple->[1] );
-    }
-    $client->DELETE( $self->{baseurl} . "/" . $tail_url );
-
-    return {
-        content => $client->responseContent(),
-        code    => $client->responseCode(),
-    };    # succeed
-}    ##  delete
-
-sub post_content {
-    my ( $self, @args ) = @_;
-    my $result = $self->post(@args);
-
-    return $result->{content};    # succeed
-}    ##  post_content
-
-sub post_json {
-    my ( $self, @args ) = @_;
-    if ( my $result = $self->post_content(@args) ) {
-        return decode_json $result;    # succeed
-    }
-    return;
-}    ##  post_json
-
-## API functions
 sub subscriptions {
     my ( $self, $force ) = @_;
     return $self->cached_array_of_hashrefs(
@@ -195,7 +80,8 @@ sub taggings {
 
 sub authentication_check {
     my ($self) = @_;
-    return ( $self->get("authentication.json")->{code} == 200 );
+    # return ( $self->get("authentication.json")->{code} == 200 );
+    return ( $self->get("authentication.json") );
 }    ##    authentication
 
 sub create_subscription {

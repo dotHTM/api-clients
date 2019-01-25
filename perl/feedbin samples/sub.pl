@@ -10,7 +10,7 @@ use Data::Dumper::Concise;
 $Data::Dumper::Sortkeys = 1;
 
 use lib ".";
-use FEEDBIN_API;
+use FeedbinClient;
 use feedbin_config;
 use mlc_stdlib;
 
@@ -42,7 +42,7 @@ sub quick_tag {
 my $tag_prefix_twitter = "x.8.";
 my $tag_delim_twitter  = " 🦆 ";
 
-my $fb           = FEEDBIN_API->init($feedbin_config::BASE_HEADERS);
+my $fb           = FeedbinClient->init($feedbin_config::BASE_HEADERS);
 my $tagging_data = read_twitter_data($SOME_PATH_FROM_COMMAND_LINE);
 foreach my $screen_name ( keys %{$tagging_data} ) {
     my $twitter_url  = "twitter.com/$screen_name";
