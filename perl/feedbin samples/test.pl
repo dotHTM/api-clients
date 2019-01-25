@@ -1,7 +1,4 @@
 #!/usr/bin/env perl
-# test.pl
-#   Description
-
 
 use feature ':5.16';
 

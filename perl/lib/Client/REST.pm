@@ -20,13 +20,26 @@ use REST::Client;
 use JSON;
 use YAML::Tiny;
 
-use lib ".";
-use parent 'PropertyCacher';
 use mlc_stdlib;
-
-
+use CachedProperty;
 
 # Constructors
+
+sub new {
+    my $inv   = shift;
+    my $class = ref($inv) || $inv;
+    my $self  = {};
+    bless( $self, $class );
+
+    $COUNT++;
+
+    return $self;
+}
+
+sub DESTROY {
+    my ($self) = @_;
+    $COUNT--;
+}
 
 sub init {
     my ( $self, @args ) = @_ ;
@@ -60,6 +73,13 @@ sub Client_REST__from_file {
 # Public Variable Methods
 
 # Static Methods
+
+sub cached_property_init {
+    my ( $self, $name ) = @_;
+    $self->{$name} = CachedProperty->init($name);
+    return $self->{$name};
+}    ##    cached_property_init
+
 
 # Object Methods
 

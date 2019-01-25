@@ -16,8 +16,6 @@ our $VERSION = 0.001000;
 
 our $COUNT = 0;
 
-use lib ".";
-use mlc_stdlib;
 use parent 'Client::REST';
 
 # Constructors
@@ -39,8 +37,8 @@ sub Client_Feedbin__from_file {
 
     croak "authentication failed" unless ( $new_obj->authentication_check );
 
-    # $new_obj->subscriptions(1);
-    # $new_obj->taggings(1);
+    $new_obj->cached_property_init("subscriptions");
+    $new_obj->cached_property_init("taggings");
 
     return $new_obj;    # succeed
 }    ##  init
@@ -59,6 +57,7 @@ sub authentication_check {
 
 sub subscriptions {
     my ( $self, $force ) = @_;
+
     return $self->cached_array_of_hashrefs(
         "subscriptions",
         sub {
