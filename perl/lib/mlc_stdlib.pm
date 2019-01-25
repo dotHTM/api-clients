@@ -8,6 +8,9 @@ use feature ':5.16';
 use strict;
 use warnings;
 
+use Carp qw{croak carp};
+use Data::Dumper;
+
 our $VERSION = 0.001000;
 
 require Exporter;
@@ -46,31 +49,17 @@ sub read_files {
 }    ##    read_files
 
 sub write_to_files {
-    my ( $filename, $buffer ) = @_;
-
-    sub write_to_one_file {
-        my ( $filename, $buffer ) = @_;
-        open( my $FILE_HANDLE, ">", $filename )
-            or croak("Cannot open $filename : $!\n");
-        print $FILE_HANDLE $buffer or croak("Cannot write $filename : $!\n");
-        return 1;    ## success
-    }    ##    write_to_one_file
-    if ( ref($filename) =~ m/^ARRAY.*/ ) {
-        foreach my $file_path ( @{$filename} ) {
-            write_to_one_file( $file_path, $buffer );
-        }
-    }
-    else {
-        write_to_one_file( $filename, $buffer );
+    my ( $buffer, @list_of_paths ) = @_;
+    foreach my $file_path (@list_of_paths) {
+        open( my $FILE_HANDLE, ">", $file_path )
+            or croak("Cannot open $file_path : $!\n");
+        print $FILE_HANDLE "$buffer" or croak("Cannot write $file_path : $!\n");
     }
     return 1;    ## success
 }    ##    write_to_files
 
-
 ################################################################
 ## assorted
-
-
 
 ################################################################
 ## Test Functions

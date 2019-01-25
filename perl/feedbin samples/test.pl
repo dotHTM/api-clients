@@ -21,4 +21,4 @@ use mlc_stdlib;
 
 my $fb = FeedbinClient->init("../../private_config.yaml");
 
-write_to_files(["debug_object.pl"],Dumper $fb->{config})
+write_to_files( Dumper $fb->{config} , "debug_object.pl" );
