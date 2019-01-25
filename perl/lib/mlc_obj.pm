@@ -16,6 +16,9 @@ our $VERSION = 0.001000;
 
 our $COUNT = 0;
 
+use lib ".";
+use mlc_stdlib;
+
 sub new {
     my $inv = shift;
     my $class = ref($inv) || $inv;
@@ -37,38 +40,6 @@ sub DESTROY {
 # Public Variable Methods
 
 # Static Methods
-
-sub match_test {
-    my ( $x, $y ) = @_;
-    
-    if( $x && $y)
-    {return $x =~ m/$y/i;}
-    return 0;
-}
-
-sub element_eq {
-    my ( $x, $y ) = @_;
-    if ( ref($x) eq "ARRAY" && ref($y) eq "ARRAY" ) {
-        if ( scalar @{$x} == scalar @{$y} ) {
-            for ( my $index = 0; $index < scalar @{$x}; $index++ ) {
-                if ( $x->[$index] ne $y->[$index] ) { return 0 }
-            }
-            return 1;
-        }
-    }
-    elsif ( ref($x) eq "HASH" && ref($y) eq "HASH" ) {
-        if ( element_eq( [ keys %{$x} ], [ keys %{$y} ] ) ) {
-            foreach my $index ( keys %{$x} ) {
-                if ( $x->{$index} ne $y->{$index} ) { return 0 }
-            }
-            return 1;
-        }
-    }
-    else {
-        return $x eq $y ? 1 : 0;
-    }
-    return 0;
-}    ##    equals_test
 
 # Object Methods
 

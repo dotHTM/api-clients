@@ -27,7 +27,7 @@ sub read_from_file {
     my ($path) = @_;
     my @result;
     open( my $fh, '<:encoding(UTF-8)', "$path" )
-      or croak "Could not open file '$path' $!";
+      or croak ("Could not open file '$path' $!");
     while ( my $line = <$fh> ) {
         chomp $line;
         push @result, "$line";
@@ -50,8 +50,8 @@ sub write_to_files {
     sub write_to_one_file {
         my ( $filename, $buffer ) = @_;
         open( my $FILE_HANDLE, ">", $filename )
-          or croak "Cannot open $filename : $!\n";
-        print $FILE_HANDLE $buffer or croak "Cannot write $filename : $!\n";
+          or croak ("Cannot open $filename : $!\n");
+        print $FILE_HANDLE $buffer or croak( "Cannot write $filename : $!\n");
         return 1;    ## success
     }    ##    write_to_one_file
     if ( ref($filename) =~ m/^ARRAY.*/ ) {
