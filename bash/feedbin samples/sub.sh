@@ -2,7 +2,7 @@
 
 ## FIXME:: Tabbed lines in the input file might be NOT be Ingored in this implementation.
 
-source "./FeedbinClient.sh"
+source "./Client::Feedbin.sh"
 
 add_twitter_follow(){
     some_user=$1 && shift

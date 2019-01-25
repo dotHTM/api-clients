@@ -20,11 +20,11 @@ use JSON;
 
 
 use lib ".";
-use FeedbinClient;
+use Client::Feedbin;
 use myapi_config;
 use FileOps;
 
-my $fb = FeedbinClient->init($myapi_config::BASE_HEADERS);
+my $fb = Client::Feedbin->init($myapi_config::BASE_HEADERS);
 
 my $data = $fb->subscriptions();
 

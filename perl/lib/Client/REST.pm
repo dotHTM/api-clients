@@ -1,7 +1,7 @@
 # mlc_obj.pm
 #   Description
 
-package RestClient;
+package Client::REST;
 
 use feature ':5.16';
 
@@ -30,10 +30,10 @@ use mlc_stdlib;
 
 sub init {
     my ( $self, @args ) = @_ ;
-    return $self->RestClient_from_file(@args);
+    return $self->Client_REST__from_file(@args);
 }   ##  init
 
-sub RestClient_from_file {
+sub Client_REST__from_file {
     my ( $self, $config_path ) = @_;
 
     my $new_obj = $self->new();

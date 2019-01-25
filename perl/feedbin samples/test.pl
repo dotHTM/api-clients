@@ -15,10 +15,10 @@ $Data::Dumper::Sortkeys = 1;
 use FindBin;
 
 use lib "$FindBin::RealBin/../lib";
-use FeedbinClient;
+use Client::Feedbin;
 
 use mlc_stdlib;
 
-my $fb = FeedbinClient->init("../../private_config.yaml");
+my $fb = Client::Feedbin->init("../../private_config.yaml");
 
-write_to_files( Dumper $fb->{config} , "debug_object.pl" );
+write_to_files( Dumper $fb->{config} , ("debug_object.pl") );

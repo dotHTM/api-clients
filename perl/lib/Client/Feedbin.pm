@@ -1,7 +1,7 @@
-# FeedbinClient.pm
+# Client::Feedbin.pm
 #   Description
 
-package FeedbinClient;
+package Client::Feedbin;
 
 use feature ':5.16';
 
@@ -18,18 +18,18 @@ our $COUNT = 0;
 
 use lib ".";
 use mlc_stdlib;
-use parent 'RestClient';
+use parent 'Client::REST';
 
 # Constructors
 sub init {
     my ( $self, @args ) = @_;
-    return $self->FeedbinClient_from_file(@args);
+    return $self->Client_Feedbin__from_file(@args);
 }    ##  init
 
-sub FeedbinClient_from_file {
+sub Client_Feedbin__from_file {
     my ( $self, $config_path ) = @_;
 
-    my $new_obj = $self->RestClient_from_file("$config_path");
+    my $new_obj = $self->Client_REST__from_file("$config_path");
     unless ( $new_obj->{config}->{version} eq $VERSION ) {
         croak("config file version mismatch");
     }
