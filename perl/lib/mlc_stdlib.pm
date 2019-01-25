@@ -17,7 +17,7 @@ require Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
     read_files
-    write_to_files
+    write_file
 
     match_test
     element_eq
@@ -27,36 +27,31 @@ our @EXPORT = qw(
 ## FileOps
 
 sub read_files {
-    my (@files) = @_;
-
-    sub read_from_file {
-        my ($path) = @_;
+    my (@path_list) = @_;
+    if ( ref( $path_list[0] ) =~ m/^ARRAY.*/ ) {
+        @path_list = @{ $path_list[0] };
+    }
+    my @result_array;
+    foreach my $path (@path_list) {
         my @result;
-        open( my $fh, '<:encoding(UTF-8)', "$path" )
-            or croak("Could not open file '$path' $!");
-        while ( my $line = <$fh> ) {
+        open( my $FILE_HANDLE, '<:encoding(UTF-8)', "$path" )
+            or croak "Could not open file '$path' $!";
+        while ( my $line = <$FILE_HANDLE> ) {
             chomp $line;
             push @result, "$line";
         }
-        return join "\n", @result;
-    }    ##    read_from_file
-
-    my @result_array;
-    foreach my $some_file (@files) {
-        push @result_array, read_from_file($some_file);
+        push @result_array, ( join "\n", @result );
     }
-    return join "\n\n", @result_array;
+    return join "\n", @result_array;
 }    ##    read_files
 
-sub write_to_files {
-    my ( $buffer, @list_of_paths ) = @_;
-    foreach my $file_path (@list_of_paths) {
-        open( my $FILE_HANDLE, ">", $file_path )
-            or croak("Cannot open $file_path : $!\n");
-        print $FILE_HANDLE "$buffer" or croak("Cannot write $file_path : $!\n");
-    }
+sub write_file {
+    my ( $filename, $buffer ) = @_;
+    open( my $FILE_HANDLE, ">", $filename )
+        or croak "Cannot open $filename : $!\n";
+    print $FILE_HANDLE $buffer or croak "Cannot write $filename : $!\n";
     return 1;    ## success
-}    ##    write_to_files
+}    ##    write_to_one_file
 
 ################################################################
 ## assorted

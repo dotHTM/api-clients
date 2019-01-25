@@ -21,4 +21,6 @@ use mlc_stdlib;
 
 my $fb = Client::Feedbin->init("../../private_config.yaml");
 
-write_to_files( Dumper $fb->{config} , ("debug_object.pl") );
+write_file( "debug_object.pl", Dumper $fb->{config} );
+
+
