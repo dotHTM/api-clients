@@ -1,0 +1,28 @@
+version: "0.001"
+feedbin:
+  options:
+    base_headers:
+      "Authorization": "Basic qwertyuiop..."
+  import:
+    twitter:
+      options:
+        tagging:
+          prefix: "x.8."
+          level: 
+            all: "0"
+            reg: "5"
+            nil: "9"
+          mid: " 🦆 "
+          suffix: ""
+      file:
+        path: "sample_twitter_taggings.txt"
+        columns:
+          first: screen_name
+          rest:  tag_name
+      data:
+        dothtm:
+          - "cool guy"
+          - "developer"
+        
+        
+        
