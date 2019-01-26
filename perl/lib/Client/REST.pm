@@ -75,8 +75,8 @@ sub Client_REST__from_file {
 # Static Methods
 
 sub cached_property_init {
-    my ( $self, $name ) = @_;
-    $self->{$name} = CachedProperty->init($name);
+    my ( $self, $name, $keys ) = @_;
+    $self->{$name} = CachedProperty->init($name, $keys);
     return $self->{$name};
 }    ##    cached_property_init
 
