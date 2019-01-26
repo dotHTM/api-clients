@@ -38,11 +38,24 @@ sub DESTROY {
 
 sub init {
     my ( $self, $name, $uniq_indexed_keys, $ordinary_indexed_keys ) = @_;
+
+    $uniq_indexed_keys     = $uniq_indexed_keys     || [];
+    $ordinary_indexed_keys = $ordinary_indexed_keys || [];
+
+    foreach my $x ( $uniq_indexed_keys, $ordinary_indexed_keys ) {
+
+        unless ( ref($x) =~ m/ARRAY/ ) {
+            croak( join "\n",
+                "$self initialized with non-hashref for index category.",
+                $x, Dumper $x );
+        }
+    }
+
     my $new_obj = $self->new();
-    $new_obj->{storage_name}  = $name;
-    $new_obj->{storage_array} = [];
-    $new_obj->{uniq_indexed_keys}  = $uniq_indexed_keys;
-    $new_obj->{ordinary_indexed_keys}  = $ordinary_indexed_keys;
+    $new_obj->{storage_name}          = $name;
+    $new_obj->{storage_array}         = [];
+    $new_obj->{uniq_indexed_keys}     = $uniq_indexed_keys;
+    $new_obj->{ordinary_indexed_keys} = $ordinary_indexed_keys;
     $new_obj->build_index();
 
     return $new_obj;    # succeed
@@ -72,8 +85,10 @@ sub set {
         || croak( "CachedProperty: "
             . $self->{storage_name}
             . ": Could not set value" );
+
     # if ( $self->{uniq_indexed_keys} && @{ $self->{uniq_indexed_keys} } ) {
     $self->build_index();
+
     # }
     return $self->{storage_array};
 }    ##  cached_array_of_hashrefs
@@ -116,10 +131,12 @@ sub scalar_index {
 
 sub reset_index {
     my ($self) = @_;
-    $self->{index} = {};
+    $self->{index}     = {};
     $self->{ord_index} = {};
     foreach my $this_index_key ( @{ $self->{uniq_indexed_keys} } ) {
-        $self->{index}->{$this_index_key} = {};
+        $self->{index}->{$this_index_key}     = {};
+    }
+    foreach my $this_index_key ( @{ $self->{ordinary_indexed_keys} } ) {
         $self->{ord_index}->{$this_index_key} = {};
     }
     return 1;
@@ -136,20 +153,15 @@ sub build_index {
 
 sub append_index {
     my ( $self, $this_element ) = @_;
-    
 
     unless ( ref($this_element) =~ m/HASH/gi ) {
         $self->{index}->{$this_element} = 1;
         return 1;
     }
-    
-foreach my $this_key (@{ $self->{uniq_indexed_keys} }) {
-    if ($self->{index}->{$this_key}->    {
-            $this_element->{$this_key}
-            }){
-        carp("index already has element at '$this_key'. Cannot guarantee one-to-one mapping on non-unique indices.");
-    }
-}
+
+    # foreach my $this_key ( @{ $self->{uniq_indexed_keys} } ) {
+
+    # }
     foreach my $this_index_key ( @{ $self->{uniq_indexed_keys} } ) {
         my $key_value;
         unless ( $key_value = $this_element->{$this_index_key} ) {
@@ -157,22 +169,27 @@ foreach my $this_key (@{ $self->{uniq_indexed_keys} }) {
             carp( Dumper $this_element );
             next;
         }
+        if ( $self->{index}->{$this_index_key}->{$key_value} ) {
+            carp(
+                "index already has element at '$this_index_key'. Cannot guarantee one-to-one mapping on non-unique indices."
+            );
+        }
         $self->{index}->{$this_index_key}->{$key_value} = $this_element;
     }
-    
-    
+
     foreach my $this_index_key ( @{ $self->{ordinary_indexed_keys} } ) {
+        # say $this_index_key;
         my $key_value;
         unless ( $key_value = $this_element->{$this_index_key} ) {
             carp("element has undef at key: $this_index_key");
             carp( Dumper $this_element );
             next;
         }
-        push @{$self->{ord_index}->{$this_index_key}->{$key_value}}, $this_element;
+        # say " -> ".$key_value;
+        push @{ $self->{ord_index}->{$this_index_key}->{$key_value} },
+            $this_element;
     }
-    
-    
-    
+
     return 1;    # succeed
 }    ##  append_index
 

@@ -18,9 +18,22 @@ use CachedProperty;
 
 use mlc_stdlib;
 
-if(0){
+if(1){
 my $fb = Client::Feedbin->init("../../private_config.yaml");
 write_file( "debug_object_fb.pl", Dumper $fb );
+}
+
+if (1) {
+    my $thing = CachedProperty->init( "thing", [ "id" ] );
+    $thing->set(
+        [   { id => 1, val => "v1" },
+            { id => 2, val => "v2" },
+            { id => 3, val => "v1" },
+            { id => 4, val => "v4" },
+        ]
+    );
+    write_file( "debug_object_hash.pl",
+        '#' . localtime->datetime . "\n" . Dumper $thing );
 }
 
 if (1) {
@@ -32,7 +45,7 @@ if (1) {
             { id => 4, val => "v4" },
         ]
     );
-    write_file( "debug_object_hash.pl",
+    write_file( "debug_object_hash_2.pl",
         '#' . localtime->datetime . "\n" . Dumper $thing );
 }
 
