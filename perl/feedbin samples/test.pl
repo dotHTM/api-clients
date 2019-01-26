@@ -18,26 +18,28 @@ use CachedProperty;
 
 use mlc_stdlib;
 
-# my $fb = Client::Feedbin->init("../../private_config.yaml");
+if(0){
+my $fb = Client::Feedbin->init("../../private_config.yaml");
+write_file( "debug_object_fb.pl", Dumper $fb );
+}
 
-# write_file( "debug_object.pl", Dumper $fb );
+if (1) {
+    my $thing = CachedProperty->init( "thing", [ "id", "val" ] );
+    $thing->set(
+        [   { id => 1, val => "v1" },
+            { id => 2, val => "v2" },
+            { id => 3, val => "v3" },
+            { id => 4, val => "v4" },
+        ]
+    );
+    write_file( "debug_object_hash.pl",
+        '#' . localtime->datetime . "\n" . Dumper $thing );
+}
 
-my $thing = CachedProperty->init( "thing", ["id"] );
-$thing->set(
-    [   { id => 1, val => "v1" },
-        { id => 2, val => "v2" },
-        { id => 3, val => "v3" },
-        { id => 4, val => "v4" },
-    ]
-);
-
-
-
-
-
-write_file( "debug_object.pl",
-    '#' . localtime->datetime . "\n" . Dumper $thing );
-
-
-
+if (1) {
+    my $thing = CachedProperty->init("thing");
+    $thing->set( [ "1", "2", "3", "4", ] );
+    write_file( "debug_object_scalar.pl",
+        '#' . localtime->datetime . "\n" . Dumper $thing );
+}
 

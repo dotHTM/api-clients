@@ -38,7 +38,7 @@ sub init_from_file {
     croak "authentication failed" unless ( $new_obj->authentication_check );
 
     $new_obj->cached_property_init( "subscriptions", ["id", "feed_id"] );
-    $new_obj->cached_property_init("taggings");
+    $new_obj->cached_property_init("taggings", ["id", "feed_id"]);
 
     $new_obj->subscriptions;
     $new_obj->taggings;
