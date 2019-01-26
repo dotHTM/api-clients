@@ -37,11 +37,12 @@ sub DESTROY {
 # Constructors
 
 sub init {
-    my ( $self, $name, $indexed_keys ) = @_;
+    my ( $self, $name, $uniq_indexed_keys, $ordinary_indexed_keys ) = @_;
     my $new_obj = $self->new();
     $new_obj->{storage_name}  = $name;
     $new_obj->{storage_array} = [];
-    $new_obj->{indexed_keys}  = $indexed_keys;
+    $new_obj->{uniq_indexed_keys}  = $uniq_indexed_keys;
+    $new_obj->{ordinary_indexed_keys}  = $ordinary_indexed_keys;
     $new_obj->build_index();
 
     return $new_obj;    # succeed
@@ -71,7 +72,7 @@ sub set {
         || croak( "CachedProperty: "
             . $self->{storage_name}
             . ": Could not set value" );
-    # if ( $self->{indexed_keys} && @{ $self->{indexed_keys} } ) {
+    # if ( $self->{uniq_indexed_keys} && @{ $self->{uniq_indexed_keys} } ) {
     $self->build_index();
     # }
     return $self->{storage_array};
@@ -116,8 +117,10 @@ sub scalar_index {
 sub reset_index {
     my ($self) = @_;
     $self->{index} = {};
-    foreach my $this_index_key ( @{ $self->{indexed_keys} } ) {
+    $self->{ord_index} = {};
+    foreach my $this_index_key ( @{ $self->{uniq_indexed_keys} } ) {
         $self->{index}->{$this_index_key} = {};
+        $self->{ord_index}->{$this_index_key} = {};
     }
     return 1;
 }
@@ -140,15 +143,14 @@ sub append_index {
         return 1;
     }
     
-foreach my $this_key (@{ $self->{indexed_keys} }) {
+foreach my $this_key (@{ $self->{uniq_indexed_keys} }) {
     if ($self->{index}->{$this_key}->    {
             $this_element->{$this_key}
             }){
         carp("index already has element at '$this_key'. Cannot guarantee one-to-one mapping on non-unique indices.");
     }
 }
-
-    foreach my $this_index_key ( @{ $self->{indexed_keys} } ) {
+    foreach my $this_index_key ( @{ $self->{uniq_indexed_keys} } ) {
         my $key_value;
         unless ( $key_value = $this_element->{$this_index_key} ) {
             carp("element has undef at key: $this_index_key");
@@ -157,6 +159,20 @@ foreach my $this_key (@{ $self->{indexed_keys} }) {
         }
         $self->{index}->{$this_index_key}->{$key_value} = $this_element;
     }
+    
+    
+    foreach my $this_index_key ( @{ $self->{ordinary_indexed_keys} } ) {
+        my $key_value;
+        unless ( $key_value = $this_element->{$this_index_key} ) {
+            carp("element has undef at key: $this_index_key");
+            carp( Dumper $this_element );
+            next;
+        }
+        push @{$self->{ord_index}->{$this_index_key}->{$key_value}}, $this_element;
+    }
+    
+    
+    
     return 1;    # succeed
 }    ##  append_index
 

@@ -24,11 +24,11 @@ write_file( "debug_object_fb.pl", Dumper $fb );
 }
 
 if (1) {
-    my $thing = CachedProperty->init( "thing", [ "id", "val" ] );
+    my $thing = CachedProperty->init( "thing", [ "id" ], ["val"] );
     $thing->set(
         [   { id => 1, val => "v1" },
             { id => 2, val => "v2" },
-            { id => 3, val => "v3" },
+            { id => 3, val => "v1" },
             { id => 4, val => "v4" },
         ]
     );
