@@ -94,25 +94,37 @@ sub set {
 }    ##  cached_array_of_hashrefs
 
 sub append {
-    my ( $self, $cache_key, $element ) = @_;
-    push @{ $self->{storage_array} }, $element
+    my ( $self, $new_element ) = @_;
+    push @{ $self->{storage_array} }, $new_element
         || croak( "CachedProperty: "
             . $self->{storage_name}
             . ": Could not update element" );
+    $self->append_index($new_element);
     return $self->{storage_array};
 }    ##  cached_array_of_hashrefs
 
 sub drop {
-    my ( $self, $cache_key, $element ) = @_;
+    my ( $self, $dropped_element ) = @_;
     my @result = ();
-    foreach my $this_element ( @{ $self->{storage_array} } ) {
-        CORE::push @result, $this_element
-            unless element_eq( $this_element, $element );
+
+    # foreach my $this_element ( @{ $self->{storage_array} } ) {
+    #     CORE::push @result, $this_element
+    #         unless element_eq( $this_element, $dropped_element );
+    # }
+
+    for ( my $i = 0; $i < scalar @{ $self->{storage_array} }; $i++ ) {
+        if ( element_eq( $self->{storage_array}->[$i], $dropped_element ) ) {
+            delete $self->{storage_array}->[$i];
+            last;
+        }
     }
-    $self->{storage_array} = \@result
-        || croak( "CachedProperty: "
-            . $self->{storage_name}
-            . ": Could not drop element" );
+    
+    $self->drop_index($dropped_element);
+
+    # $self->{storage_array} = \@result
+    #     || croak( "CachedProperty: "
+    #         . $self->{storage_name}
+    #         . ": Could not drop element" );
     return $self->{storage_array};
 }    ##  cached_array_of_hashrefs
 
@@ -133,11 +145,11 @@ sub reset_index {
     my ($self) = @_;
     $self->{index}     = {};
     $self->{ord_index} = {};
-    foreach my $this_index_key ( @{ $self->{uniq_indexed_keys} } ) {
-        $self->{index}->{$this_index_key}     = {};
+    foreach my $this_index ( @{ $self->{uniq_indexed_keys} } ) {
+        $self->{index}->{$this_index} = {};
     }
-    foreach my $this_index_key ( @{ $self->{ordinary_indexed_keys} } ) {
-        $self->{ord_index}->{$this_index_key} = {};
+    foreach my $this_index ( @{ $self->{ordinary_indexed_keys} } ) {
+        $self->{ord_index}->{$this_index} = {};
     }
     return 1;
 }
@@ -162,35 +174,58 @@ sub append_index {
     # foreach my $this_key ( @{ $self->{uniq_indexed_keys} } ) {
 
     # }
-    foreach my $this_index_key ( @{ $self->{uniq_indexed_keys} } ) {
-        my $key_value;
-        unless ( $key_value = $this_element->{$this_index_key} ) {
-            carp("element has undef at key: $this_index_key");
+    foreach my $this_index ( @{ $self->{uniq_indexed_keys} } ) {
+        my $index_key;
+        unless ( $index_key = $this_element->{$this_index} ) {
+            carp("element has undef at key: $this_index");
             carp( Dumper $this_element );
             next;
         }
-        if ( $self->{index}->{$this_index_key}->{$key_value} ) {
+        if ( $self->{index}->{$this_index}->{$index_key} ) {
             carp(
-                "index already has element at '$this_index_key'. Cannot guarantee one-to-one mapping on non-unique indices."
+                "index already has element at '$this_index'. Cannot guarantee one-to-one mapping on non-unique indices."
             );
         }
-        $self->{index}->{$this_index_key}->{$key_value} = $this_element;
+        $self->{index}->{$this_index}->{$index_key} = $this_element;
     }
 
-    foreach my $this_index_key ( @{ $self->{ordinary_indexed_keys} } ) {
-        # say $this_index_key;
-        my $key_value;
-        unless ( $key_value = $this_element->{$this_index_key} ) {
-            carp("element has undef at key: $this_index_key");
+    foreach my $this_index ( @{ $self->{ordinary_indexed_keys} } ) {
+        my $index_key;
+        unless ( $index_key = $this_element->{$this_index} ) {
+            carp("element has undef value at key: $this_index");
             carp( Dumper $this_element );
             next;
         }
-        # say " -> ".$key_value;
-        push @{ $self->{ord_index}->{$this_index_key}->{$key_value} },
+        push @{ $self->{ord_index}->{$this_index}->{$index_key} },
             $this_element;
     }
 
     return 1;    # succeed
 }    ##  append_index
+
+sub drop_index {
+    my ( $self, $dropped_element ) = @_;
+    
+    say "looking for". Dumper $dropped_element; 
+
+    foreach my $this_index ( @{ $self->{uniq_indexed_keys} } ) {
+        my $index_key = $dropped_element->{$this_index};
+        delete $self->{index}->{$this_index}->{$index_key};
+    }
+    foreach my $this_index ( @{ $self->{ordinary_indexed_keys} } ) {
+        my $index_key = $dropped_element->{$this_index};
+
+        for ( my $i = 0; $i < scalar @{ $self->{ord_index}->{$this_index}->{$index_key} }; $i++ ) {
+            if ( element_eq( $self->{ord_index}->{$this_index}->{$index_key}->[$i], $dropped_element ) )
+            {
+                delete $self->{ord_index}->{$this_index}->{$index_key}->[$i];
+                last;
+            }
+        }
+
+    }
+
+    return 1;    # succeed
+}    ##  drop_index
 
 1;
