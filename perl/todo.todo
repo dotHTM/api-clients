@@ -1,6 +1,7 @@
 
 CachedProperty:
 
+ [ ] Should indices point to the storage array position instead of the value? might be easier to implement?
  [ ] Flag that says "uniq index can be trusted to be uniq"
  [ ] scalar and array storage are indexed
  [ ] drop should report when the element was not found, i.e. nothing was changed, data might be stale
