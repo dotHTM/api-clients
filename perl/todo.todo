@@ -1,0 +1,15 @@
+
+CachedProperty:
+
+ [ ] Flag that says "uniq index can be trusted to be uniq"
+ [ ] scalar and array storage are indexed
+ [ ] drop should report when the element was not found, i.e. nothing was changed, data might be stale
+ [ ] return/drop on partial information, i.e. an index key and a index value. return should say whether the index was a uniq or not
+   0 -> not found
+   1 -> found via uniq index
+   2 -> found via ordinary index
+   3 -> more intense lookup
+
+FeedBin:
+
+ [ ] on_stale method, runs defined command when stale suspected.

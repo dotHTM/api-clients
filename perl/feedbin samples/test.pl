@@ -14,7 +14,7 @@ use Time::Piece;
 
 use lib "$FindBin::RealBin/../lib";
 
-# use Client::Feedbin;
+use Client::Feedbin;
 use CachedProperty;
 
 use mlc_stdlib;
@@ -23,12 +23,12 @@ my $buffer ;
 
 
 
-if (0) {
+if (1) {
     my $fb = Client::Feedbin->init("../../private_config.yaml");
     write_file( "debug_object_fb.pl", Dumper $fb );
 }
 
-if (1) {
+if (0) {
     my $thing = CachedProperty->init( "thing", ["id"] );
     $thing->set(
                 [   { id => 1, val => "v1" },
@@ -43,7 +43,7 @@ if (1) {
                '#' . localtime->datetime . "\n" . Dumper $thing );
 }
 
-if (1) {
+if (0) {
     my $thing = CachedProperty->init( "thing", ["id"], ["val"] );
     $thing->set(
                 [   { id => 1, val => "v1" },
@@ -58,7 +58,7 @@ if (1) {
                '#' . localtime->datetime . "\n" . Dumper $thing );
 }
 
-if (1) {
+if (0) {
     my $thing = CachedProperty->init("thing", ["id"]);
     $thing->set( [ ["1"],
                 ["2"],
@@ -69,7 +69,7 @@ if (1) {
                '#' . localtime->datetime . "\n" . Dumper $thing );
 }
 
-if (1) {
+if (0) {
     my $thing = CachedProperty->init("thing", ["id"]);
     $thing->set( [ "1", "2", "3", "4", ] );
     $thing->append("5");
@@ -78,4 +78,4 @@ if (1) {
                '#' . localtime->datetime . "\n" . Dumper $thing );
 }
 
-write_file( "debug_object_dropped.pl", $buffer);
+# write_file( "debug_object_dropped.pl", $buffer);
